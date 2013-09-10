@@ -7,12 +7,10 @@
       myColor,
       ws,
       inactive,
-// TODO: change this!
       inactiveTimeout = 1000 * 60,
       wsServer = location.href.replace('http:', 'ws:') + 'ws',
       wsSession,
       rateLimit,
-// TODO: change this!
       rateLimitTimeout= 1000;
 
   function getRandomColor() {
@@ -84,19 +82,8 @@
     speck.tween.play();
   }
 
-  function render() {
-    // context.clearRect(0, 0, canvas.width, canvas.height);
-    // oneSpeck.draw();
-    // drawSpeck(250, 250);
-  }
-
-  // function gotSpecks(topic, newSpecks) {
   function gotSpecks(topic, speck) {
-    // console.log('got speck');
-    // console.log('got ' + newSpecks.length + ' new specks');
-    // newSpecks.forEach(function (speck) {
-      drawSpeck(speck.x, speck.y, speck.color);
-    // });
+    drawSpeck(speck.x, speck.y, speck.color);
   }
   
   function getSpecks() {
@@ -115,17 +102,14 @@
     stage.add(layer);
     msgLayer = new Kinetic.Layer();
     stage.add(msgLayer);
-    // show mouse position
-    // stage.on('mousemove', function () {
-    //   var mousePos = stage.getMousePosition();
-    //   writeMessage('x: ' + mousePos.x + ', y: ' + mousePos.y);
-    // });
+
+    // add click and tap handlers
     stage.on('mousedown', function () {
       var mousePos = stage.getMousePosition();
       // makeSpeck(mousePos.x, mousePos.y, getRandomColor());
       makeSpeck(mousePos.x, mousePos.y, myColor);
     });
-    stage.on('tap', function () {
+    stage.on('touchstart', function () {
       var touchPos = stage.getTouchPosition();
       makeSpeck(touchPos.x, touchPos.y, myColor);
     });

@@ -7,27 +7,50 @@
   </head>
   <style>
     body {
-      /* background-color: #ABABAB; */
       background-color: #404040;
+    }
+    .center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
     }
     #container {
       width: 600px;
       height: 600px;
-      /* background-color: white; */
       background-color: #C2C2C2;
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      margin: auto;
+    }
+    h1 {
+      text-align: center;
+      font-size: 60;
+      font-family: sans-serif;
+      margin-top: 15px;
+      color: white;
+    }
+    #title {
+      width: 600px;
+      height: 100px;
+    }
+    p {
+      text-align: center;
+    }
+    a {
+      color: white;
+    }
+    #footer {
+      width: 600px;
+      height: 50px;
     }
   </style>
   <meta name="viewport" content="width=600">
   <body>
     <div id="content">
-      <div id="status"></div>
-      <div id="container"></div>
+      <div id="title" class="center">
+        <h1 class="center">Speck</h1>
+      </div>
+      <div id="container" class="center"></div>
+      <div id="footer" class="center">
+        <p><a href="https://github.com/jcelliott/speck">On Github</a></p>
+      </div>
     </div>
   </body>
 </html>

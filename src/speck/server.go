@@ -20,6 +20,6 @@ func main() {
 
 	fmt.Println("Listening on port " + *port)
 	if err := http.ListenAndServe(":"+*port, nil); err != nil {
-		log.Fatal("ListenAndServe:", err)
+		log.Fatal("Speck:", err)
 	}
 }
