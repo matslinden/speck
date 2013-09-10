@@ -1,10 +1,19 @@
 (function () {
   "use strict";
   var stage,
+      stageSize = 600,
       msgLayer,
       layer,
       myColor,
-      ws;
+      ws,
+      inactive,
+// TODO: change this!
+      inactiveTimeout = 1000 * 60,
+      wsServer = location.href.replace('http:', 'ws:') + 'ws',
+      wsSession,
+      rateLimit,
+// TODO: change this!
+      rateLimitTimeout= 1000;
 
   function getRandomColor() {
     var val = hslToRgb(Math.random(), 1.0, 0.5);
@@ -48,9 +57,10 @@
   function writeMessage(message) {
     var context = msgLayer.getContext();
     msgLayer.clear();
-    context.font = '12pt Calibri';
-    context.fillStyle = 'black';
-    context.fillText(message, 10, 25);
+    context.font = '14pt Calibri';
+    context.textAlign = 'center';
+    context.fillStyle = 'gray';
+    context.fillText(message, stageSize/2, stageSize/2);
   }
 
   function drawSpeck(x, y, color) {
@@ -98,8 +108,8 @@
   function initKinetic() {
     stage = new Kinetic.Stage({
       container: 'container',
-      width: 600,
-      height: 600
+      width: stageSize,
+      height: stageSize
     });
     layer = new Kinetic.Layer();
     stage.add(layer);
@@ -122,34 +132,58 @@
   }
 
   function makeSpeck(x, y, color) {
-    if(ws) {
-      ws.publish("speck:data", {x: x, y: y, color: color}, true);
+    refreshInactive();
+    if(wsSession._websocket_connected) {
+      if (checkRateLimit()) {
+        wsSession.publish("speck:data", {x: x, y: y, color: color}, true);
+      }
+    } else {
+      connectWebsocket();
+      return;
     }
     drawSpeck(x, y, color);
   }
 
-  function initWebsockets() {
-    var server = location.href.replace('http:', 'ws:') + 'ws';
-    ab.connect(server, connect, disconnect);
+  function checkRateLimit() {
+    if (rateLimit) {
+      return false;
+    }
+    rateLimit = setTimeout(function () {
+      rateLimit = null;
+    }, rateLimitTimeout);
+    return true;
   }
 
-  function connect(session) {
+  function refreshInactive() {
+    clearTimeout(inactive);
+    inactive = setTimeout(disconnectWebsocket, inactiveTimeout);
+  }
+
+  function connectWebsocket() {
+    ab.connect(wsServer, wsConnect, wsDisconnect);
+  }
+
+  function disconnectWebsocket() {
+    wsSession.close();
+  }
+
+  function wsConnect(session) {
     console.log('WAMP client connected');
-    ws = session;
-    document.querySelector('#status').innerHTML = "";
+    wsSession = session;
+    writeMessage("");
     session.subscribe('speck:data', gotSpecks);
+    refreshInactive();
   }
 
-  function disconnect(code, reason) {
+  function wsDisconnect(code, reason) {
+    writeMessage("Disconnected - Click to reconnect");
     console.log('WAMP client disconnected: ' + code + ": " + reason);
-    // document.querySelector('#status').innerHTML = reason;
-    document.querySelector('#status').innerHTML = "Disconnected";
   }
   
   function init() {
     myColor = getRandomColor();
     initKinetic();
-    initWebsockets();
+    connectWebsocket();
     // setInterval(getSpecks, 500);
     render();
   }
