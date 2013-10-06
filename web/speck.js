@@ -11,7 +11,7 @@
       wsServer = location.href.replace('http:', 'ws:') + 'ws',
       wsSession,
       rateLimit,
-      rateLimitTimeout= 1000;
+      rateLimitTimeout= 500;
 
   function getRandomColor() {
     var val = hslToRgb(Math.random(), 1.0, 0.5);
