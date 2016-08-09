@@ -1,10 +1,9 @@
 package main
 
 import (
-	"code.google.com/p/go.net/websocket"
 	"flag"
 	"fmt"
-	"github.com/jcelliott/turnpike"
+	"gopkg.in/jcelliott/turnpike.v2"
 	"log"
 	"net/http"
 )
@@ -13,8 +12,7 @@ var port = flag.String("port", "8080", "port to run the server on")
 
 func main() {
 	flag.Parse()
-	s := turnpike.NewServer()
-	ws := websocket.Handler(s.HandleWebsocket)
+	ws := turnpike.NewBasicWebsocketServer("realm1")
 	http.Handle("/ws", ws)
 	http.Handle("/", http.FileServer(http.Dir("web")))
 

@@ -82,7 +82,7 @@
     speck.tween.play();
   }
 
-  function gotSpecks(topic, speck) {
+  function gotSpecks(args, speck, details) {
     drawSpeck(speck.x, speck.y, speck.color);
   }
   
@@ -117,9 +117,9 @@
 
   function makeSpeck(x, y, color) {
     refreshInactive();
-    if(wsSession._websocket_connected) {
+    if(wsSession.isOpen) {
       if (checkRateLimit()) {
-        wsSession.publish("speck:data", {x: x, y: y, color: color}, true);
+        wsSession.publish('speck.data', [], {x: x, y: y, color: color});
       }
     } else {
       connectWebsocket();
@@ -143,25 +143,33 @@
     inactive = setTimeout(disconnectWebsocket, inactiveTimeout);
   }
 
+  var connection = new autobahn.Connection({
+    url: wsServer,
+    realm: 'realm1'
+  });
+  connection.onopen = wsConnect;
+  connection.onclose = wsDisconnect;
+
   function connectWebsocket() {
-    ab.connect(wsServer, wsConnect, wsDisconnect);
+    connection.open();
   }
 
   function disconnectWebsocket() {
-    wsSession.close();
+    connection.close();
   }
 
   function wsConnect(session) {
     console.log('WAMP client connected');
     wsSession = session;
     writeMessage("");
-    session.subscribe('speck:data', gotSpecks);
+    session.subscribe('speck.data', gotSpecks);
     refreshInactive();
   }
 
-  function wsDisconnect(code, reason) {
+  function wsDisconnect(reason, details) {
     writeMessage("Disconnected - Click to reconnect");
-    console.log('WAMP client disconnected: ' + code + ": " + reason);
+    console.log('WAMP client disconnected: ' + reason + ": " +
+                details.reason + ", " + details.message);
   }
   
   function init() {
@@ -169,7 +177,7 @@
     initKinetic();
     connectWebsocket();
     // setInterval(getSpecks, 500);
-    render();
+    // render();
   }
   window.addEventListener('load', init);
 })();
