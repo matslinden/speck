@@ -8,7 +8,7 @@
       ws,
       inactive,
       inactiveTimeout = 1000 * 60,
-      wsServer = location.href.replace('http:', 'ws:') + 'ws',
+      wsServer = appConfiguration.wsServer,
       wsSession,
       rateLimit,
       rateLimitTimeout= 500;
